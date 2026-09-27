@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroCalc Scientific Calculator | C math.h Suite</title>
+  <meta name="description" content="A modern, high-precision scientific calculator web application mirroring C standard library math.h capabilities.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-ambient">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+  </div>
+
+  <main class="calculator-app">
+    <!-- Header / Brand -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-badge">C99 math.h</div>
+        <h1 class="brand-title">Aero<span>Calc</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="btn-math-modal" class="pill-btn highlight-pill" title="View C math.h Function Mapping">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>math.h Guide</span>
+        </button>
+        <button id="btn-history-toggle" class="pill-btn" title="Calculation History">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span>History</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="calculator-card">
+      <!-- Screen Display -->
+      <section class="display-container" aria-label="Calculator Screen">
+        <div class="status-bar">
+          <span id="badge-angle" class="status-badge active-mode">DEG</span>
+          <span id="badge-2nd" class="status-badge">2nd</span>
+          <span id="badge-hyp" class="status-badge">HYP</span>
+          <span id="badge-mem" class="status-badge">M: 0</span>
+        </div>
+        <div id="expression-display" class="expression-line" aria-live="polite"></div>
+        <div id="result-display" class="result-line" aria-live="polite">0</div>
+      </section>
+
+      <!-- Function Switchers & Memory Bar -->
+      <section class="controls-bar" aria-label="Mode Controls">
+        <div class="control-group toggles-group">
+          <button id="toggle-angle" class="chip-btn active" title="Switch between Degrees and Radians">DEG</button>
+          <button id="toggle-2nd" class="chip-btn" title="Toggle inverse & alternative functions">2nd</button>
+          <button id="toggle-hyp" class="chip-btn" title="Toggle hyperbolic trigonometric functions">HYP</button>
+        </div>
+        <div class="control-group memory-group">
+          <button id="mem-clear" class="chip-btn mem-btn" title="Clear Memory (MC)">MC</button>
+          <button id="mem-recall" class="chip-btn mem-btn" title="Recall Memory (MR)">MR</button>
+          <button id="mem-plus" class="chip-btn mem-btn" title="Add to Memory (M+)">M+</button>
+          <button id="mem-minus" class="chip-btn mem-btn" title="Subtract from Memory (M-)">M-</button>
+        </div>
+      </section>
+
+      <!-- Keypad Grid -->
+      <section class="keypad-grid" aria-label="Keypad">
+        <!-- Row 1: Editing & Core Constants -->
+        <button class="key func-key" data-action="paren-open">(</button>
+        <button class="key func-key" data-action="paren-close">)</button>
+        <button class="key func-key" data-action="factorial" data-c="tgamma(n+1)">x!</button>
+        <button class="key func-key" data-action="reciprocal">1/x</button>
+        <button class="key func-key" data-action="const-pi" data-c="M_PI">π</button>
+        <button class="key func-key" data-action="const-e" data-c="M_E">e</button>
+        <button class="key action-key clear-key" data-action="clear" id="key-ac">AC</button>
+        <button class="key action-key del-key" data-action="delete" id="key-del">⌫</button>
+
+        <!-- Row 2: Powers & Roots -->
+        <button class="key func-key" data-action="pow-2" data-base="sq">x²</button>
+        <button class="key func-key" data-action="pow-y" data-c="pow(x,y)">xʸ</button>
+        <button class="key func-key" data-action="sqrt" data-c="sqrt(x)">√x</button>
+        <button class="key num-key" data-num="7">7</button>
+        <button class="key num-key" data-num="8">8</button>
+        <button class="key num-key" data-num="9">9</button>
+        <button class="key op-key" data-op="/" data-symbol="÷">÷</button>
+        <button class="key func-key" data-action="abs" data-c="fabs(x)">|x|</button>
+
+        <!-- Row 3: Trigonometry & Exponential -->
+        <button class="key func-key trig-key" data-action="sin" data-c="sin(x)">sin</button>
+        <button class="key func-key trig-key" data-action="cos" data-c="cos(x)">cos</button>
+        <button class="key func-key trig-key" data-action="tan" data-c="tan(x)">tan</button>
+        <button class="key num-key" data-num="4">4</button>
+        <button class="key num-key" data-num="5">5</button>
+        <button class="key num-key" data-num="6">6</button>
+        <button class="key op-key" data-op="*" data-symbol="×">×</button>
+        <button class="key func-key" data-action="percent">%</button>
+
+        <!-- Row 4: Logarithms & Basic Numbers -->
+        <button class="key func-key" data-action="ln" data-c="log(x)">ln</button>
+        <button class="key func-key" data-action="log10" data-c="log10(x)">log₁₀</button>
+        <button class="key func-key" data-action="exp" data-c="exp(x)">eˣ</button>
+        <button class="key num-key" data-num="1">1</button>
+        <button class="key num-key" data-num="2">2</button>
+        <button class="key num-key" data-num="3">3</button>
+        <button class="key op-key" data-op="-" data-symbol="−">−</button>
+        <button class="key func-key" data-action="mod" data-c="fmod(a,b)">mod</button>
+
+        <!-- Row 5: Extended Math & Equals -->
+        <button class="key func-key" data-action="cbrt" data-c="cbrt(x)">∛x</button>
+        <button class="key func-key" data-action="round" data-c="round(x)">rnd</button>
+        <button class="key func-key" data-action="negate">±</button>
+        <button class="key num-key zero-key" data-num="0">0</button>
+        <button class="key num-key" data-num=".">.</button>
+        <button class="key op-key" data-op="+" data-symbol="+">+</button>
+        <button class="key equals-key" data-action="equals" id="key-equals">=</button>
+      </section>
+    </div>
+
+    <!-- History Panel Slide Drawer -->
+    <aside id="history-drawer" class="history-drawer">
+      <div class="history-header">
+        <h3>Calculation History</h3>
+        <button id="btn-clear-history" class="text-btn">Clear</button>
+        <button id="btn-close-history" class="close-icon-btn" aria-label="Close history">&times;</button>
+      </div>
+      <div id="history-list" class="history-list">
+        <div class="empty-history">No calculations recorded yet</div>
+      </div>
+    </aside>
+
+    <!-- Modal: C math.h Function Mapping & Educational Reference -->
+    <div id="math-modal" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <h2>C Standard Library &lt;math.h&gt; Reference Guide</h2>
+            <p>How scientific calculator operations map directly to ANSI C / C99 functions</p>
+          </div>
+          <button id="btn-close-modal" class="close-icon-btn">&times;</button>
+        </div>
+        <div class="modal-content">
+          <div class="c-code-banner">
+            <span class="code-tag">Include Required</span>
+            <code>#define _USE_MATH_DEFINES<br>#include &lt;math.h&gt;</code>
+            <span class="code-note">Linker flag: <code>-lm</code></span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="math-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Calculator Key</th>
+                  <th>C &lt;math.h&gt; Signature</th>
+                  <th>Formula / Domain Rules</th>
+                  <th>C Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="tag trig-tag">Trigonometry</span></td>
+                  <td><code>sin</code>, <code>cos</code>, <code>tan</code></td>
+                  <td><code>double sin(double x)</code><br><code>double cos(double x)</code><br><code>double tan(double x)</code></td>
+                  <td>x is in <strong>radians</strong>.<br>Degree formula: <code>x * (M_PI / 180.0)</code></td>
+                  <td><code>double s = sin(45 * M_PI / 180);</code></td>
+                </tr>
+                <tr>
+                  <td><span class="tag trig-tag">Inverse Trig</span></td>
+                  <td><code>asin</code>, <code>acos</code>, <code>atan</code></td>
+                  <td><code>double asin(double x)</code><br><code>double acos(double x)</code><br><code>double atan(double x)</code></td>
+                  <td>asin/acos Domain: <code>-1.0 &le; x &le; 1.0</code>.<br>Returns radians.</td>
+                  <td><code>double rad = asin(0.5); // returns PI/6</code></td>
+                </tr>
+                <tr>
+                  <td><span class="tag hyp-tag">Hyperbolic</span></td>
+                  <td><code>sinh</code>, <code>cosh</code>, <code>tanh</code></td>
+                  <td><code>double sinh(double x)</code><br><code>double cosh(double x)</code><br><code>double tanh(double x)</code></td>
+                  <td>sinh(x) = (eˣ - e⁻ˣ)/2<br>cosh(x) = (eˣ + e⁻ˣ)/2</td>
+                  <td><code>double h = sinh(1.0);</code></td>
+                </tr>
+                <tr>
+                  <td><span class="tag log-tag">Logarithms</span></td>
+                  <td><code>ln</code>, <code>log₁₀</code></td>
+                  <td><code>double log(double x)</code><br><code>double log10(double x)</code></td>
+                  <td>Natural log is <code>log()</code>.<br>Domain: <code>x &gt; 0</code>.</td>
+                  <td><code>double l = log(M_E); // 1.0</code><br><code>double l10 = log10(100); // 2.0</code></td>
+                </tr>
+                <tr>
+                  <td><span class="tag pow-tag">Powers & Roots</span></td>
+                  <td><code>xʸ</code>, <code>√x</code>, <code>∛x</code>, <code>eˣ</code></td>
+                  <td><code>double pow(double x, double y)</code><br><code>double sqrt(double x)</code><br><code>double cbrt(double x)</code><br><code>double exp(double x)</code></td>
+                  <td>sqrt requires <code>x &ge; 0</code>.<br>cbrt supports negative numbers.</td>
+                  <td><code>double p = pow(2.0, 8.0); // 256.0</code><br><code>double r = sqrt(16.0); // 4.0</code></td>
+                </tr>
+                <tr>
+                  <td><span class="tag num-tag">Rounding & Mod</span></td>
+                  <td><code>|x|</code>, <code>rnd</code>, <code>mod</code></td>
+                  <td><code>double fabs(double x)</code><br><code>double round(double x)</code><br><code>double fmod(double x, double y)</code></td>
+                  <td><code>fabs()</code> for floating absolute value.<br><code>fmod()</code> for float remainder.</td>
+                  <td><code>double m = fmod(7.5, 2.0); // 1.5</code></td>
+                </tr>
+                <tr>
+                  <td><span class="tag spec-tag">Combinatorics</span></td>
+                  <td><code>x!</code> (Factorial)</td>
+                  <td><code>double tgamma(double x)</code></td>
+                  <td>Gamma function property:<br><code>n! = tgamma(n + 1.0)</code></td>
+                  <td><code>double f5 = tgamma(5.0 + 1.0); // 120</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
